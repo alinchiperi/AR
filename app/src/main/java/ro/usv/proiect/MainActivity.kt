@@ -34,7 +34,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rotateLeftButton: Button
     private lateinit var rotateRightButton: Button
     private var currentModelIndex = 0
-    private var modelFiles = mutableListOf("models/sofa.glb", "models/office_chair.glb")
+    private var modelFiles = mutableListOf(
+        "models/sofa.glb",
+        "models/office_chair.glb",
+        "models/shelf.glb",
+        "models/sofa_leather.glb"
+    )
     private val placedModels = mutableListOf<ArModelNode>()  // Track placed models
     private val rotationAngle = 45f  // Rotation angle in degrees
 
@@ -92,7 +97,6 @@ class MainActivity : AppCompatActivity() {
                 val materialInstance = it.materialInstances[0]
             }
 
-
         }
         sceneView.addChild(modelNode)
         modelNode.addChild(videoNode)
@@ -103,13 +107,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun placeModel() {
 
-        // Create a new model node for each placement and anchor it in the AR scene
         val newModelNode = ArModelNode(sceneView.engine, PlacementMode.INSTANT).apply {
             loadModelGlbAsync(
                 glbFileLocation = modelFiles[currentModelIndex],
                 scaleToUnits = 1f,
                 centerOrigin = Position(-0.5f)
             ) {
+                rotation = modelNode.rotation
                 anchor()
             }
         }
@@ -117,26 +121,9 @@ class MainActivity : AppCompatActivity() {
         sceneView.addChild(newModelNode)
         placedModels.add(newModelNode)
 
-
-        if (currentModelIndex < modelFiles.size - 1) {
-            currentModelIndex++
-            // Update the preview model to show the next object
-            modelNode.loadModelGlbAsync(
-                glbFileLocation = modelFiles[currentModelIndex],
-                scaleToUnits = 1f,
-                centerOrigin = Position(-0.5f)
-            )
-        } else {
-            // If we've placed all models, hide the place button and remove the preview model
-            placeButton.isGone = true
-            if (sceneView.children.contains(modelNode)) {
-                sceneView.removeChild(modelNode)
-            }
-        }
     }
 
     private fun setupInitialModelNode() {
-        // Load the initial model but don't anchor it yet
         modelNode.loadModelGlbAsync(
             glbFileLocation = modelFiles[currentModelIndex],
             scaleToUnits = 1f,
@@ -173,18 +160,5 @@ class MainActivity : AppCompatActivity() {
                 z = currentRotation.z
             )
         }
-
-        // Rotate the last placed model if it exists
-        if (placedModels.isNotEmpty()) {
-            val lastModel = placedModels.last()
-            val currentRotation = lastModel.rotation
-            lastModel.rotation = Rotation(
-                x = currentRotation.x,
-                y = currentRotation.y + angle,
-                z = currentRotation.z
-            )
-        }
     }
-
-
 }
