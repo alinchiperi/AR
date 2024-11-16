@@ -31,9 +31,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var videoNode: VideoNode
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var selectButton: Button
+    private lateinit var rotateLeftButton: Button
+    private lateinit var rotateRightButton: Button
     private var currentModelIndex = 0
     private var modelFiles = mutableListOf("models/sofa.glb", "models/office_chair.glb")
     private val placedModels = mutableListOf<ArModelNode>()  // Track placed models
+    private val rotationAngle = 45f  // Rotation angle in degrees
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +52,9 @@ class MainActivity : AppCompatActivity() {
         placeButton = findViewById(R.id.place)
 
         selectButton = findViewById<Button>(R.id.select)
+        rotateLeftButton = findViewById<Button>(R.id.leftButton)
+        rotateRightButton = findViewById<Button>(R.id.rightButton)
+
         selectButton.setOnClickListener {
             switchModel()
         }
@@ -56,6 +62,14 @@ class MainActivity : AppCompatActivity() {
         placeButton.setOnClickListener {
             placeModel()
         }
+
+        rotateLeftButton.setOnClickListener {
+            rotateModel(-rotationAngle)
+        }
+        rotateRightButton.setOnClickListener {
+            rotateModel(rotationAngle)
+        }
+
 
         videoNode = VideoNode(
             sceneView.engine,
@@ -88,10 +102,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun placeModel() {
-//        if (sceneView.children.contains(modelNode)) {
-//            sceneView.removeChild(modelNode) // Remove initial model from scene
-//        }
-
 
         // Create a new model node for each placement and anchor it in the AR scene
         val newModelNode = ArModelNode(sceneView.engine, PlacementMode.INSTANT).apply {
@@ -153,5 +163,28 @@ class MainActivity : AppCompatActivity() {
             centerOrigin = Position(-0.5f)
         )
     }
+
+    private fun rotateModel(angle: Float) {
+        if (::modelNode.isInitialized) {
+            val currentRotation = modelNode.rotation
+            modelNode.rotation = Rotation(
+                x = currentRotation.x,
+                y = currentRotation.y + angle,
+                z = currentRotation.z
+            )
+        }
+
+        // Rotate the last placed model if it exists
+        if (placedModels.isNotEmpty()) {
+            val lastModel = placedModels.last()
+            val currentRotation = lastModel.rotation
+            lastModel.rotation = Rotation(
+                x = currentRotation.x,
+                y = currentRotation.y + angle,
+                z = currentRotation.z
+            )
+        }
+    }
+
 
 }
