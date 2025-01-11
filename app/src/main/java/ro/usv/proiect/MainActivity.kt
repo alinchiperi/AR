@@ -38,10 +38,11 @@ class MainActivity : AppCompatActivity() {
         "models/sofa.glb",
         "models/office_chair.glb",
         "models/shelf.glb",
-        "models/sofa_leather.glb"
+        "models/sofa_leather.glb",
+        "models/computer_desk.glb",
     )
-    private val placedModels = mutableListOf<ArModelNode>()  // Track placed models
-    private val rotationAngle = 45f  // Rotation angle in degrees
+    private val placedModels = mutableListOf<ArModelNode>()
+    private val rotationAngle = 45f
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
